@@ -1,5 +1,8 @@
 aiohttp
+tornado
 motor
 nltk
 pymorphy2
 torch
+aiogram
+dnspython
