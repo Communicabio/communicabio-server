@@ -15,6 +15,7 @@ import db
 import dialog
 import metric
 import tgbot
+import util
 
 
 async def main():
@@ -69,7 +70,7 @@ async def main():
             phrases,
         )
 
-        web_app = aioweb.Application()
+        web_app = aioweb.Application(middlewares=[util.cors])
         http_api.setup_app(web_app)
 
         await asyncio.gather(

@@ -56,3 +56,17 @@ def make_route_adder(app):
             app.add_routes([getattr(aioweb, method.lower())(path, func)])
 
     return add_route
+
+
+@aioweb.middleware
+async def cors(request, handler):
+    response = await handler(request)
+
+    response.headers.update({
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+    })
+
+    return response

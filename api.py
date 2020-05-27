@@ -70,12 +70,12 @@ class Api:
         return aioweb.json_response({"metrics": metrics.as_dict()})
 
     @util.route("POST", "/user")
-    async def dialog(self, request):
+    async def user(self, request):
         params = await request.json()
         user = await self.db.user(token=params["token"])
 
         return aioweb.json_response({"user": {
             "name": user.name,
-            "state": user.state,
+            "state": user.state.value,
             "last_dialog": user.last_dialog,
         }})
