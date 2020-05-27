@@ -1,3 +1,5 @@
+import json
+
 import aiohttp.web as aioweb
 
 
@@ -21,7 +23,7 @@ class ApiClient:
 
         async with self.session.post(url, json=kwargs) as response:
             response.raise_for_status()
-            return await response.json()
+            return json.loads(await response.read())
 
 
 def route(*args, **kwargs):
