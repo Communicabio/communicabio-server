@@ -8,6 +8,22 @@ import util
 import vk
 
 
+MOCK_RATING_N = 40
+
+MOCK_RATING = [
+    {
+        "rating": random.randint(1, 50) * 5,
+        "name": f"user-{i + 1}"
+    }
+    for i in range(MOCK_RATING_N)
+]
+
+MOCK_RATING.sort(key=lambda el: -el["rating"])
+
+for i, entry in enumerate(MOCK_RATING):
+    entry["place"] = i + 1
+
+
 class Api:
     def __init__(self, db, dialog_client, metric_client, vk_secret, phrases):
         self.db = db
@@ -69,13 +85,24 @@ class Api:
         metrics = await self.metric_client.evaluate(user.last_dialog)
         return aioweb.json_response({"metrics": metrics.as_dict()})
 
-    @util.route("POST", "/user")
+    @util.route("GET", "/user")
     async def user(self, request):
-        params = await request.json()
+        params = request.url.query
         user = await self.db.user(token=params["token"])
+
+        rating_data = MOCK_RATING[MOCK_RATING_N // 2]
 
         return aioweb.json_response({"user": {
             "name": user.name,
             "state": user.state.value,
             "last_dialog": user.last_dialog,
+            "rating": rating_data["rating"],
+            "place": rating_data["place"],
         }})
+
+    @util.route("GET", "/rating")
+    async def users_by_rating(self, request):
+        params = request.url.query
+        return aioweb.json_response({
+            "rating": MOCK_RATING[params["n"]:params["m"]],
+        })
