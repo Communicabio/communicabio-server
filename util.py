@@ -72,3 +72,10 @@ async def cors(request, handler):
     })
 
     return response
+
+
+def is_truthy(s):
+    if s is None:
+        return False
+
+    return s.lower() in ("y", "yes", "1", "true")

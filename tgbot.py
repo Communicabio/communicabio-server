@@ -27,6 +27,7 @@ class Bot:
         self.db = db
         self.dialog_client = dialog_client
         self.metric_client = metric_client
+        self.token = token
         self.phrases = phrases
 
         self.__bot = aiogram.Bot(token=token)
@@ -34,7 +35,16 @@ class Bot:
         self.__dispatchable_handle_message = \
             self.__dispatcher.message_handler()(self.__handle_message)
 
-    async def run(self):
+    def setup_app(self, app):
+        app["BOT_DISPATCHER"] = self.__dispatcher
+
+        app.router.add_route(
+            "*", f"/webhooks/telegram/{self.token}",
+            aiogram.dispatcher.webhook.WebhookRequestHandler,
+            name="telegram_webhook_handler",
+        )
+
+    async def poll(self):
         await self.__dispatcher.start_polling()
 
     async def __handle_message(self, message):
