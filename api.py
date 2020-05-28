@@ -104,5 +104,5 @@ class Api:
     async def users_by_rating(self, request):
         params = request.url.query
         return aioweb.json_response({
-            "rating": MOCK_RATING[params["n"]:params["m"]],
+            "rating": MOCK_RATING[int(params["n"]):int(params["m"])],
         })
