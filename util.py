@@ -72,19 +72,14 @@ def make_route_adder(app):
 @aioweb.middleware
 async def cors(request, handler):
     try:
-        response = await handler(request)
-        response.headers.update(CORS_HEADERS)
-        return response
+        return await handler(request)
     except asyncio.CancelledError:
         raise
-    except aioweb.HTTPException as exc:
-        exc.headers.update(CORS_HEADERS)
-        raise
+    # except aioweb.HTTPException as exc:
+    #     exc.headers.update(CORS_HEADERS)
+    #     raise
     except Exception as exc:
-        raise aioweb.HTTPBadRequest(
-            headers=CORS_HEADERS,
-            text=repr(exc),
-        )
+        return aioweb.json_response({"error": repr(exc)})
 
 
 def is_truthy(s):
