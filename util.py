@@ -4,14 +4,6 @@ import json
 import aiohttp.web as aioweb
 
 
-CORS_HEADERS = {
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "*",
-    "Access-Control-Allow-Headers": "*",
-}
-
-
 class ApiClient:
     def __init__(self, session, api):
         self.session = session
@@ -76,13 +68,9 @@ async def cors(request, handler):
     except asyncio.CancelledError:
         raise
     except aioweb.HTTPException as exc:
-        exc.headers.update(CORS_HEADERS)
-        raise exc
+        raise
     except Exception as exc:
-        raise aioweb.HTTPBadRequest(
-            headers=CORS_HEADERS,
-            text=repr(exc),
-        )
+        raise aioweb.HTTPBadRequest(text=repr(exc))
 
 
 def is_truthy(s):

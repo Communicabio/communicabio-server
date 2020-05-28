@@ -10,6 +10,7 @@ from pathlib import Path
 
 import aiohttp
 import aiohttp.web as aioweb
+import aiohttp_cors
 
 import api
 import db
@@ -76,6 +77,15 @@ async def main():
         )
 
         web_app = aioweb.Application(middlewares=[util.cors])
+
+        cors = aiohttp_cors.setup(web_app, defaults={
+            "*": aiohttp_cors.ResourceOptions(
+                allow_credentials=True,
+                expose_headers="*",
+                allow_headers="*",
+            ),
+        })
+
         http_api.setup_app(web_app)
 
         tasks = [aioweb._run_app(web_app, host=args.host, port=args.port)]
@@ -84,6 +94,10 @@ async def main():
             telegram_bot.setup_app(web_app)
         else:
             tasks.append(telegram_bot.poll())
+
+        for route in web_app.router.routes():
+            if route.name != "telegram_webhook_handler":
+                cors.add(route)
 
         await asyncio.gather(*tasks)
 
