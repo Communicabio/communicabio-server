@@ -3,6 +3,7 @@ tornado
 motor
 nltk
 pymorphy2
-torch
 aiogram
 dnspython
+-f https://download.pytorch.org/whl/torch_stable.html
+torch==1.5.0+cpu

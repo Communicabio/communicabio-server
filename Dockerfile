@@ -6,16 +6,11 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 RUN ls /app
-RUN python3 /app/db.py
+RUN python3 -m nltk.downloader 'punkt'
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
-CMD cd /app && python3 ./main.py \
-    --telegram-token $TELEGRAM_TOKEN \
-    --vk-secret $VK_SECRET \
-    --port $PORT \
-    --metric-api $BERT_URL \
-    --dialog-api $GPT2_URL \
-    --mongodb $MONGO_URL
+RUN echo $PORT
+CMD cd /app && ./runme.sh

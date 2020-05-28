@@ -6,7 +6,7 @@ import pymorphy2
 
 from util import ApiClient
 
-
+nltk.download("punkt")
 MORPH = pymorphy2.MorphAnalyzer()
 
 
