@@ -80,6 +80,10 @@ async def cors(request, handler):
     #     raise
     except Exception as exc:
         return aioweb.json_response({"error": repr(exc)})
+        # raise aioweb.HTTPBadRequest(
+        #     text=json.dumps({"error": repr(exc)}),
+        #     content_type="application/json",
+        # )
 
 
 def is_truthy(s):

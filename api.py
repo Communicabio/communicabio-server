@@ -106,3 +106,14 @@ class Api:
         return aioweb.json_response({
             "rating": MOCK_RATING[int(params["n"]):int(params["m"])],
         })
+
+    @util.route("POST", "/rollback")
+    async def rollback(self, request):
+        params = await request.json()
+        user = await self.db.user(token=params["token"])
+
+        if len(user.last_dialog) > 1:
+            del user.last_dialog[-2:]
+            await self.db.update_dialog(user)
+
+        return aioweb.json_response({})
