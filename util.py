@@ -1,6 +1,15 @@
+import asyncio
 import json
 
 import aiohttp.web as aioweb
+
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*",
+}
 
 
 class ApiClient:
@@ -62,16 +71,18 @@ def make_route_adder(app):
 
 @aioweb.middleware
 async def cors(request, handler):
-    response = await handler(request)
-
-    response.headers.update({
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
-    })
-
-    return response
+    try:
+        return await handler(request)
+    except asyncio.CancelledError:
+        raise
+    except aioweb.HTTPException as exc:
+        exc.headers.update(CORS_HEADERS)
+        raise exc
+    except Exception as exc:
+        raise aioweb.HTTPBadRequest(
+            headers=CORS_HEADERS,
+            text=repr(exc),
+        )
 
 
 def is_truthy(s):
