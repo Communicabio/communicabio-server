@@ -20,8 +20,26 @@ class User:
         self.telegram_id = row.get("telegram_id")
         self.vk_id = row.get("vk_id")
         self.token = row["token"]
-        self.state = UserState(row["state"])
-        self.last_dialog = row["last_dialog"]
+        self.state = UserState(row.get("state", UserState.MAIN_MENU.value))
+        self.last_dialog = row.get("last_dialog")
+        self.num_dialogs = row.get("num_dialogs", 0)
+        self.sum_score = row.get("sum_score", 0)
+        self.avg_score = row.get("avg_score", 0)
+
+    def as_dict(self):
+        return {
+            "state": self.state.value,
+            **((key, getattr(self, key, None)) for key in (
+                "name",
+                "telegram_id",
+                "vk_id",
+                "token",
+                "last_dialog",
+                "num_dialogs",
+                "sum_score",
+                "avg_score",
+            ))
+        }
 
 
 class Db:
@@ -52,17 +70,15 @@ class Db:
             if id_key == "token":
                 return None
 
-            user = {
+            user = User({
                 "name": name,
                 id_key: id_value,
                 "token": secrets.token_hex(TOKEN_LENGTH),
-                "state": UserState.MAIN_MENU.value,
-                "last_dialog": None,
-            }
+            })
 
-            await self.__users.insert_one(user)
+            await self.__users.insert_one(user.as_dict())
 
-        return User(user)
+        return user
 
     async def new_dialog(self, user, initial_message):
         if user.state == UserState.DIALOG:
