@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import aiohttp
-import aiohttp.web as aioweb
 import argparse
 import asyncio
 import concurrent.futures
@@ -9,6 +7,9 @@ import contextlib
 import json
 import os
 from pathlib import Path
+
+import aiohttp
+import aiohttp.web as aioweb
 
 import api
 import db
