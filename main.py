@@ -10,6 +10,7 @@ from pathlib import Path
 
 import aiohttp
 import aiohttp.web as aioweb
+import aiohttp_cors
 
 import api
 import db
@@ -21,6 +22,10 @@ import util
 
 async def main():
     args = parse_args()
+
+    if args.telegram_token is None:
+        raise Exception("missing --telegram-token")
+
     assets = Path(args.assets)
 
     with open(assets / "start_phrases.json") as phrase_file:
@@ -72,18 +77,45 @@ async def main():
         )
 
         web_app = aioweb.Application(middlewares=[util.cors])
+
+        cors = aiohttp_cors.setup(web_app, defaults={
+            "*": aiohttp_cors.ResourceOptions(
+                allow_credentials=True,
+                expose_headers="*",
+                allow_headers="*",
+            ),
+        })
+
         http_api.setup_app(web_app)
 
-        await asyncio.gather(
-            telegram_bot.run(),
-            aioweb._run_app(web_app, host=args.host, port=args.port),
-        )
+        tasks = [aioweb._run_app(web_app, host=args.host, port=args.port)]
+
+        if args.use_telegram_webhooks:
+            telegram_bot.setup_app(web_app)
+        else:
+            tasks.append(telegram_bot.poll())
+
+        for route in web_app.router.routes():
+            if route.name != "telegram_webhook_handler":
+                cors.add(route)
+
+        await asyncio.gather(*tasks)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Communicabio Telegram bot server",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "--use-telegram-webhooks",
+        action="store_true",
+        default=util.is_truthy(getenv("TELEGRAM_WEBHOOKS")),
+        help=(
+            "use Telegram webhooks at /webhooks/telegram/TELEGRAM_TOKEN "
+            "instead of long polling"
+        ),
     )
 
     parser.add_argument(
