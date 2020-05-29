@@ -15,8 +15,19 @@
 
 ## Deployment to GCP
 
+```shell
 PROJECT_ID=stunning-hull-187717
 IMAGE=communicabio_server
 VERSION=1
 
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE
+```
+
+## Setting up webhooks...
+
+```shell
+curl -X POST \
+     --header "Content-Type: application/json" \
+     -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0"}' \
+     'https://api.telegram.org/bot1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0/setWebhook'
+```

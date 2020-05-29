@@ -13,4 +13,10 @@ RUN python3 -m nltk.downloader 'punkt'
 # For environments with multiple CPU cores, increase the number of workers
 # to be equal to the cores available.
 RUN echo $PORT
-CMD cd /app && ./runme.sh
+CMD cd /app && ./main.py \
+    --telegram-token $TELEGRAM_TOKEN \
+    --vk-secret $VK_SECRET \
+    --port $PORT \
+    --metric-api $BERT_URL \
+    --dialog-api $DIALOG_URL \
+    --mongodb $MONGO_URL
