@@ -15,6 +15,10 @@ class MetricSet:
         self.positivity = positivity
         self.politeness = politeness
 
+    @property
+    def score(self):
+        return (self.positivity + self.politeness) / 2
+
     def as_dict(self):
         return {
             "coherence": self.coherence,

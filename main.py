@@ -38,6 +38,7 @@ async def main():
         polite_words = json.load(polite_word_file)
 
     database = db.Db(args.mongodb)
+    await database.setup()
 
     async with contextlib.AsyncExitStack() as stack:
         http_session = await stack.enter_async_context(aiohttp.ClientSession())
@@ -76,7 +77,7 @@ async def main():
             phrases,
         )
 
-        web_app = aioweb.Application(middlewares=[util.cors])
+        web_app = aioweb.Application(middlewares=[util.middleware])
 
         cors = aiohttp_cors.setup(web_app, defaults={
             "*": aiohttp_cors.ResourceOptions(

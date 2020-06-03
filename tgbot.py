@@ -78,7 +78,10 @@ class Bot:
 
     async def _new(self, user, message):
         if user.state != db.UserState.MAIN_MENU:
-            await self.__print_report(user, message)
+            metrics = await self.metric_client.evaluate(user.last_dialog)
+            user.add_score(metrics)
+
+            await self.__print_report(user, message, metrics)
 
         initial_message = random.choice(self.phrases)
 
@@ -94,13 +97,14 @@ class Bot:
 
             return
 
+        metrics = await self.metric_client.evaluate(user.last_dialog)
+        user.add_score(metrics)
+
         await self.db.finish_dialog(user)
 
-        await self.__print_report(user, message)
+        await self.__print_report(user, message, metrics)
 
-    async def __print_report(self, user, message):
-        metrics = await self.metric_client.evaluate(user.last_dialog)
-
+    async def __print_report(self, user, message, metrics):
         await message.answer((
             f"Ваш результат:\n"
             # f" – связность: {metrics.coherence}\n"

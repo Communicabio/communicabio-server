@@ -8,22 +8,6 @@ import util
 import vk
 
 
-MOCK_RATING_N = 40
-
-MOCK_RATING = [
-    {
-        "rating": random.randint(1, 50) * 5,
-        "name": f"user-{i + 1}"
-    }
-    for i in range(MOCK_RATING_N)
-]
-
-MOCK_RATING.sort(key=lambda el: -el["rating"])
-
-for i, entry in enumerate(MOCK_RATING):
-    entry["place"] = i + 1
-
-
 class Api:
     def __init__(self, db, dialog_client, metric_client, vk_secret, phrases):
         self.db = db
@@ -80,9 +64,12 @@ class Api:
         params = await request.json()
         user = await self.db.user(token=params["token"])
 
-        await self.db.finish_dialog(user)
-
         metrics = await self.metric_client.evaluate(user.last_dialog)
+
+        if user.state == db.UserState.DIALOG:
+            user.add_score(metrics)
+            await self.db.finish_dialog(user)
+
         return aioweb.json_response({"metrics": metrics.as_dict()})
 
     @util.route("GET", "/user")
@@ -90,22 +77,23 @@ class Api:
         params = request.url.query
         user = await self.db.user(token=params["token"])
 
-        rating_data = MOCK_RATING[MOCK_RATING_N // 2]
-
         return aioweb.json_response({"user": {
             "name": user.name,
+            "id": str(user.id),
             "state": user.state.value,
             "last_dialog": user.last_dialog,
-            "rating": rating_data["rating"],
-            "place": rating_data["place"],
+            "rating": user.avg_score,
+            "place": await self.db.user_place(user),
         }})
 
     @util.route("GET", "/rating")
     async def users_by_rating(self, request):
-        params = request.url.query
-        return aioweb.json_response({
-            "rating": MOCK_RATING[int(params["n"]):int(params["m"])],
-        })
+        start, end = (int(request.url.query[key]) for key in ("n", "m"))
+        leaderboard = await self.db.leaderboard(start, end)
+        return aioweb.json_response({"rating": [
+            user.as_public_dict()
+            for user in leaderboard
+        ]})
 
     @util.route("POST", "/rollback")
     async def rollback(self, request):
