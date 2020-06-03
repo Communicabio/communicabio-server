@@ -44,11 +44,7 @@ async def main():
         http_session = await stack.enter_async_context(aiohttp.ClientSession())
 
         pool = stack.enter_context(concurrent.futures.ProcessPoolExecutor(
-            max_workers=args.num_workers,
-            initializer=metric.make_worker_initializer({
-                model: assets / f"{model}.bin"
-                for model in ("positivity", "toxicity")
-            }),
+            max_workers=args.num_workers
         ))
 
         dialog_client = dialog.Client.connect(http_session, args.dialog_api)

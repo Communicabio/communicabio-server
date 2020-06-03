@@ -18,7 +18,6 @@
 ```shell
 PROJECT_ID=stunning-hull-187717
 IMAGE=communicabio_server
-VERSION=1
 
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE
 ```
