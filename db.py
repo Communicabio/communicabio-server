@@ -145,14 +145,20 @@ class Db:
         return [
             User(user)
             for user in await self.__users.find(
-                {}, sort=[("avg_score", pymongo.DESCENDING)],
+                {}, sort=[
+                    ("avg_score", pymongo.DESCENDING),
+                    ("_id", pymongo.ASCENDING),
+                ],
                 skip=start,
                 limit=end - start,
             ).to_list(length=None)
         ]
 
     async def user_place(self, user):
-        return await self.__users.count_documents({
-            "avg_score": {"$gt": user.avg_score},
-            "_id": {"$lt": user.id},
-        })
+        return await self.__users.count_documents({"$or": [
+            {"avg_score": {"$gt": user.avg_score}},
+            {
+                "avg_score": {"$eq": user.avg_score},
+                "_id": {"$lt": user.id},
+            },
+        ]})
