@@ -27,9 +27,10 @@ class Api:
         if vk_params is None:
             return aioweb.json_response({"error": "invalid signature"})
 
+        name = vk_params["first_name"] + " " + vk_params["last_name"]
         user = await self.db.user(
-            name=params["name"],
-            vk_id=vk_params["vk_user_id"],
+            name=name,
+            vk_id=vk_params["uid"],
         )
 
         return aioweb.json_response({"token": user.token})
@@ -64,8 +65,9 @@ class Api:
         params = await request.json()
         user = await self.db.user(token=params["token"])
 
+        print('metrics_init', flush=True)
         metrics = await self.metric_client.evaluate(user.last_dialog)
-
+        print('metrics_done', flush=True)
         if user.state == db.UserState.DIALOG:
             user.add_score(metrics)
             await self.db.finish_dialog(user)

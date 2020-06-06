@@ -14,22 +14,29 @@ CORS_HEADERS = {
 
 
 class ApiClient:
-    def __init__(self, session, api):
+    def __init__(self, session, api, en_api=None):
         self.session = session
         self.api = api
+        self.en_api = en_api
 
     @classmethod
-    def connect(cls, session, api):
+    def connect(cls, session, api, en_api=None):
         if api is None:
             return cls.mock()
         else:
-            return cls(session, api)
+            return cls(session, api, en_api)
 
-    async def _post(self, path=None, **kwargs):
+    async def _post(self, path=None, en=False, **kwargs):
         if path is None:
-            url = self.api
+            if not en:
+                url = self.api
+            else:
+                url = self.en_api
         else:
-            url = f"{self.api}/{path}"
+            if not en:
+                url = f"{self.api}/{path}"
+            else:
+                url = f"{self.en_api}/{path}"
 
         async with self.session.post(url, json=kwargs) as response:
             response.raise_for_status()
@@ -86,3 +93,12 @@ def is_truthy(s):
         return False
 
     return s.lower() in ("y", "yes", "1", "true")
+
+cyrillic = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮЁ"
+cyrillic = set(cyrillic + cyrillic.lower())
+
+def is_english(text):
+    for char in text:
+        if char in cyrillic:
+            return False
+    return True

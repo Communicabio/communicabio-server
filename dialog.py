@@ -9,5 +9,5 @@ class MockClient:
 class Client(ApiClient):
     mock = MockClient
 
-    async def reply(self, messages):
-        return (await self._post(history=messages))["text"]
+    async def reply(self, messages, en=False):
+        return (await self._post(history=messages, en=en))["text"]

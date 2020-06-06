@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import urllib.parse
 
+APP_ID = "7472129"
 
 def extract_data(vk_secret, s):
     if s.startswith("?"):
@@ -11,23 +12,15 @@ def extract_data(vk_secret, s):
 
     params = dict(urllib.parse.parse_qsl(s, keep_blank_values=True))
 
-    vk_params = collections.OrderedDict(sorted(
-        (key, value)
-        for key, value in params.items() if key.startswith("vk_")
-    ))
 
-    vk_params_enc = urllib.parse.urlencode(vk_params, doseq=True)
-
-    hash_code = base64.b64encode(hmac.HMAC(
-        vk_secret.encode(),
-        vk_params_enc.encode(),
-        hashlib.sha256,
-    ).digest())
-
-    decoded_hash_code = hash_code.decode()[:-1] \
-        .replace("+", "-").replace("/", "_")
-
-    if params["sign"] != decoded_hash_code:
+    hash_code = hashlib.md5((APP_ID + params['uid'] + vk_secret).encode()).hexdigest()
+    print(hash_code)
+    if params["hash"] != hash_code:
         return None
 
     return params
+
+if __name__ == "__main__":
+    key = input("SECRET: ")
+    query = input("QUERY: ")
+    print(extract_data(key, query))

@@ -19,7 +19,6 @@ import metric
 import tgbot
 import util
 
-
 async def main():
     args = parse_args()
 
@@ -31,12 +30,6 @@ async def main():
     with open(assets / "start_phrases.json") as phrase_file:
         phrases = json.load(phrase_file)["data"]
 
-    with open(assets / "obscene_words.json") as obscene_word_file:
-        obscene_words = json.load(obscene_word_file)
-
-    with open(assets / "polite_words.json") as polite_word_file:
-        polite_words = json.load(polite_word_file)
-
     database = db.Db(args.mongodb)
     await database.setup()
 
@@ -47,14 +40,13 @@ async def main():
             max_workers=args.num_workers
         ))
 
-        dialog_client = dialog.Client.connect(http_session, args.dialog_api)
+        dialog_client = dialog.Client.connect(http_session, args.dialog_api, args.en_dialog_api)
 
         metric_client = metric.Client.connect(
             pool,
             http_session,
             args.metric_api,
-            obscene_words,
-            polite_words,
+            None
         )
 
         telegram_bot = tgbot.Bot(
@@ -142,13 +134,19 @@ def parse_args():
     parser.add_argument(
         "--dialog-api",
         default=getenv("DIALOG_API"),
-        help="dialog API address",
+        help="russian dialog API address",
     )
 
     parser.add_argument(
         "--metric-api",
         default=getenv("METRIC_API"),
         help="metric API address",
+    )
+
+    parser.add_argument(
+        "--en-dialog-api",
+        default=getenv("EN_DIALOG_API"),
+        help="english dialog API address",
     )
 
     parser.add_argument(

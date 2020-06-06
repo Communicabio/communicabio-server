@@ -5,9 +5,9 @@ import nltk
 import pymorphy2
 
 from util import ApiClient
+from util import is_english
 
 MORPH = pymorphy2.MorphAnalyzer()
-
 
 class MetricSet:
     def __init__(self, coherence, positivity, politeness, coherence_mistakes=[], \
@@ -48,24 +48,20 @@ class MockClient:
 class Client(ApiClient):
     mock = MockClient
 
-    def __init__(self, pool, session, api, obscene_words, polite_words):
-        super().__init__(session, api)
+    def __init__(self, pool, session, api, en_api):
+        super().__init__(session, api, en_api)
         self.pool = pool
-        self.obscene_words = obscene_words
-        self.polite_words = polite_words
 
     @classmethod
-    def connect(cls, pool, session, api, obscene_words, polite_words):
+    def connect(cls, pool, session, api, en_api):
         if api is None:
             return cls.mock()
         else:
-            return Client(pool, session, api, obscene_words, polite_words)
+            return Client(pool, session, api, en_api)
 
     async def evaluate(self, messages):
-
         results = await asyncio.gather(*map(self.__evaluate_dialog,
                                 [(messages, metric) for metric in ["positivity", "politeness"]]))
-
         positivity_mistakes = results[0]['mistakes']
         politeness_mistakes = results[1]['mistakes']
         positivity_score = results[0]['score']
@@ -80,6 +76,8 @@ class Client(ApiClient):
         )
 
     async def __evaluate_dialog(self, args):
+        print('__evaluate_dialog', args, flush=True)
         messages, metric = args
-        results = (await self._post(text=messages, metric=metric))
-        return results
+        results = (await self._post(en=True, text=messages, metric=metric))
+        print('__evaluate_dialog, results', args, flush=True)
+        return result
