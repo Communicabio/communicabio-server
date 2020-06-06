@@ -63,6 +63,7 @@ class Api:
     @util.route("POST", "/finish_dialog")
     async def finish_dialog(self, request):
         params = await request.json()
+        print(params, flush=True)
         user = await self.db.user(token=params["token"])
 
         print('metrics_init', flush=True)
