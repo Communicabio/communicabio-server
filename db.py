@@ -17,7 +17,7 @@ class UserState(enum.Enum):
 class User:
     def __init__(self, row):
         self.name = row["name"]
-        self.id = row["_id"]
+        self.id = row.get("_id")
         self.telegram_id = row.get("telegram_id")
         self.vk_id = row.get("vk_id")
         self.token = row["token"]
@@ -100,7 +100,7 @@ class Db:
                 "token": secrets.token_hex(TOKEN_LENGTH),
             })
 
-            await self.__users.insert_one(user.as_dict())
+            user.id = (await self.__users.insert_one(user.as_dict())).inserted_id
         else:
             user = User(user)
 
