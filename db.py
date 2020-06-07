@@ -99,9 +99,8 @@ class Db:
                 id_key: id_value,
                 "token": secrets.token_hex(TOKEN_LENGTH),
             })
-            inserted_id = await self.__users.insert_one(user.as_dict()).inserted_id
-            user = await self.__users.find_one({'_id': inserted_id})
-            user = User(user)
+
+            user.id = (await self.__users.insert_one(user.as_dict())).inserted_id
         else:
             user = User(user)
 
