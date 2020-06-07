@@ -1,5 +1,6 @@
 import random
 import util
+from util import is_english
 
 import aiohttp.web as aioweb
 
@@ -26,8 +27,9 @@ class Api:
 
         if vk_params is None:
             return aioweb.json_response({"error": "invalid signature"})
-
+        print(vk_params, flush=True)
         name = vk_params["first_name"] + " " + vk_params["last_name"]
+        print(name, vk_params['uid'], flush=True)
         user = await self.db.user(
             name=name,
             vk_id=vk_params["uid"],
@@ -53,7 +55,7 @@ class Api:
 
         user.last_dialog.append(params["message"])
 
-        reply_message = await self.dialog_client.reply(user.last_dialog)
+        reply_message = await self.dialog_client.reply(user.last_dialog, en=is_english(user.last_dialog[0]))
         user.last_dialog.append(reply_message)
 
         await self.db.update_dialog(user)

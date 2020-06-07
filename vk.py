@@ -14,7 +14,6 @@ def extract_data(vk_secret, s):
 
 
     hash_code = hashlib.md5((APP_ID + params['uid'] + vk_secret).encode()).hexdigest()
-    print(hash_code)
     if params["hash"] != hash_code:
         return None
 

@@ -27,6 +27,7 @@ class ApiClient:
             return cls(session, api, en_api)
 
     async def _post(self, path=None, en=False, **kwargs):
+        print('_post', path, en, flush=True)
         if path is None:
             if not en:
                 url = self.api
@@ -38,6 +39,7 @@ class ApiClient:
             else:
                 url = f"{self.en_api}/{path}"
 
+        print('_post2', flush=True)
         async with self.session.post(url, json=kwargs) as response:
             response.raise_for_status()
             return json.loads(await response.read())

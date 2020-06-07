@@ -13,16 +13,17 @@ class UserState(enum.Enum):
     MAIN_MENU = 1
     DIALOG = 2
 
+START_PHRASE = "Привет! Я Communicabio. Обычно я буду писать тебе с какой-то просьбой или требованием. Тебе нужно будет договориться со мной, в том числе отказать, если условия не нравятся. Просто пиши мне в чат и мы все обсудим. Если захочешь изменить свою реплику, нажми на “Отмена”. Когда закончишь с диалогом, нажми на “Закончить”. Потребуется некоторое время, чтобы оценить диалог, а затем появится результат. Если я найду какие-то ошибки, то покажу их. Заверши диалог, чтобы закончить обучение."
 
 class User:
     def __init__(self, row):
         self.name = row["name"]
-        self.id = row["_id"]
+        self.id = row.get("_id")
         self.telegram_id = row.get("telegram_id")
         self.vk_id = row.get("vk_id")
         self.token = row["token"]
-        self.state = UserState(row.get("state", UserState.MAIN_MENU.value))
-        self.last_dialog = row.get("last_dialog")
+        self.state = UserState(row.get("state", UserState.Dialog.value))
+        self.last_dialog = row.get("last_dialog", [START_PHRASE])
         self.num_dialogs = row.get("num_dialogs", 0)
         self.sum_score = row.get("sum_score", 0)
         self.avg_score = row.get("avg_score", 0)
@@ -89,7 +90,6 @@ class Db:
             )
 
         user = await self.__users.find_one({id_key: id_value})
-
         if user is None:
             if id_key == "token":
                 return None
@@ -99,8 +99,9 @@ class Db:
                 id_key: id_value,
                 "token": secrets.token_hex(TOKEN_LENGTH),
             })
-
-            await self.__users.insert_one(user.as_dict())
+            inserted_id = await self.__users.insert_one(user.as_dict()).inserted_id
+            user = await self.__users.find_one({'_id': inserted_id})
+            user = User(user)
         else:
             user = User(user)
 

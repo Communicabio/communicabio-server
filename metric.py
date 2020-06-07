@@ -76,8 +76,6 @@ class Client(ApiClient):
         )
 
     async def __evaluate_dialog(self, args):
-        print('__evaluate_dialog', args, flush=True)
         messages, metric = args
-        results = (await self._post(en=True, text=messages, metric=metric))
-        print('__evaluate_dialog, results', args, flush=True)
-        return result
+        results = (await self._post(text=messages, metric=metric))
+        return results
