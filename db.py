@@ -22,7 +22,7 @@ class User:
         self.telegram_id = row.get("telegram_id")
         self.vk_id = row.get("vk_id")
         self.token = row["token"]
-        self.state = UserState(row.get("state", UserState.Dialog.value))
+        self.state = UserState(row.get("state", UserState.DIALOG.value))
         self.last_dialog = row.get("last_dialog", [START_PHRASE])
         self.num_dialogs = row.get("num_dialogs", 0)
         self.sum_score = row.get("sum_score", 0)
@@ -94,6 +94,7 @@ class Db:
             if id_key == "token":
                 return None
 
+            print("ln97", name, flush=True)
             user = User({
                 "name": name,
                 id_key: id_value,
