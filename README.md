@@ -1,4 +1,8 @@
+
 # communicabio-server
+
+This is our API server. It's stateless scalable and efficient. 
+Recent versions lack support for ``Telegram``. 
 
 ## Usage
 
@@ -13,7 +17,7 @@
 ```
 
 
-## Deployment to GCP
+### Deployment to GCP
 
 ```shell
 PROJECT_ID=stunning-hull-187717
@@ -22,11 +26,11 @@ IMAGE=communicabio_server
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE
 ```
 
-## Setting up webhooks...
+### Setting up Telegram webhooks...
 
 ```shell
 curl -X POST \
      --header "Content-Type: application/json" \
-     -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0"}' \
-     'https://api.telegram.org/bot1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0/setWebhook'
+     -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/$MYTOKEN"}' \
+     'https://api.telegram.org/bot$MYTOKEN/setWebhook'
 ```
