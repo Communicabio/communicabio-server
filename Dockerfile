@@ -5,6 +5,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 
-CMD cd /app && uvicorn app:app
-#    --metric-api $BERT_URL \
-#    --dialog-api $DIALOG_URL \
+CMD cd /app && uvicorn app:app --host 0.0.0.0
