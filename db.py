@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, Tuple, List
 from json import JSONEncoder
 import json
-from types import *
+from schemes import *
 
 class MongoDB:
     def __init__(self, url: str, lang: str ='en'):
@@ -25,7 +25,7 @@ class MongoDB:
         user.dialog.append(phrase)
         return user
 
-    def finish_dialog(self, user: User) -> Tuple[User, dialog]:
+    def finish_dialog(self, user: User) -> Tuple[User, Dialog]:
         attrs = ['politeness', 'positivity'];
         dialog = Dialog(phrases=user.dialog)
         for attr in attrs:
@@ -39,7 +39,7 @@ class MongoDB:
             if cnt != 0:
                 setattr(dialog, attr, total / cnt)
         self.dialogs.insert_one(dialog.dict());
-        self.users.update_one({'_id': user._id, {'$set': {'dialog': [], 'state': 0}}})
+        self.users.update_one({'_id': user._id}, {'$set': {'dialog': [], 'state': 0}})
         user.dialog = []
         user.state = 0
         return (user, dialog)

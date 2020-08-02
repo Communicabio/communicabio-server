@@ -2,7 +2,9 @@ import pymongo
 from pydantic import BaseModel
 from typing import Optional, Tuple, List
 from json import JSONEncoder
+from bson.objectid import ObjectId
 import json
+import pydantic
 
 def _default(self, obj):
     return getattr(obj.__class__, "toJSON", _default.default)(obj)

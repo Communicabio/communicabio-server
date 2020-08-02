@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from fastapi import FastAPI, HTTPException, Body
 import hmac
 import logging
@@ -89,13 +89,13 @@ def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List
                 return "To start new dialog use /new"
         else:
             user = databases[lang].add_phrase(database.add_phrase(user, message))
-            phrase = dialog_managers[lang].continue(user.dialog)
+            phrase = dialog_managers[lang].reply(user.dialog)
             database.add_phrase(databases[lang].add_phrase(user, phrase))
     else:
         return commands[command[0]](user_id=user_id, name=name, lang=lang)
 
 @app.get("/tg/{token}")
-def receive_update(token: str, update: Dict[Any] = Body(..., embed=True)):
+def receive_update(token: str, update: Dict[Any, Any] = Body(..., embed=True)):
     lang = None
     for TOKEN in token2lang:
         if hmac.compare_digest(TOKEN, token):
