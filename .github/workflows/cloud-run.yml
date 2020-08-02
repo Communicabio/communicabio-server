@@ -55,4 +55,5 @@ jobs:
           --region "$RUN_REGION" \
           --image "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA" \
           --platform "managed" \
-          --allow-unauthenticated
+          --allow-unauthenticated \
+          --set-env-vars=TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN}},MONGO_URL=${{ secrets.MONGO_URL}}
