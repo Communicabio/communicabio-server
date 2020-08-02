@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, Tuple, List
 from json import JSONEncoder
 import json
+import logging
 from schemes import *
 
 class MongoDB:
@@ -40,7 +41,9 @@ class MongoDB:
             if cnt != 0:
                 setattr(dialog, attr, total / cnt)
         self.dialogs.insert_one(dialog.dict());
+        logging.debug(self.users.find_one({'_id': user._id}))
         self.users.update_one({'_id': user._id}, {'$set': {'dialog': [], 'state': 0}})
+        logging.debug(type(user._id))
         user.dialog = []
         user.state = 0
         return (user, dialog)
