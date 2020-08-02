@@ -118,8 +118,8 @@ def receive_update(token: str, update: Dict[Any, Any] = Body(...)):
 
     text = process(chat_id, update['message']['text'], name, lang)
     if isinstance(text, str):
-        send_text(chat_id, text)
+        send_text(chat_id, text, lang)
     else:
         for message in text:
-            send_text(chat_id, message)
+            send_text(chat_id, message, lang)
     return {"ok": True}
