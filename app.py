@@ -95,7 +95,7 @@ def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List
         return commands[command[0]](user_id=user_id, name=name, lang=lang)
 
 @app.post("/tg/{token}")
-def receive_update(token: str, update: Dict[Any, Any] = Body(..., embed=True)):
+def receive_update(token: str, update: Dict[Any, Any] = Body(...)):
     lang = None
     for TOKEN in token2lang:
         if hmac.compare_digest(TOKEN, token):
