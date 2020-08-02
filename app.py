@@ -105,6 +105,7 @@ def receive_update(token: str, update: Dict[Any, Any] = Body(...)):
         raise HTTPException(status_code=403, detail="Invalid token")
     if 'message' not in update:
         return {'error': 'Message is missing in the update'}
+    logging.warning(update)
     chat_id = update['message']['chat']
     if 'text' not in update:
         return {'error': 'Text is missing in the message'}
