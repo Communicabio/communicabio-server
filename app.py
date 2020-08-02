@@ -69,7 +69,7 @@ def new_dialog(user_id: int, name: str, lang: str, **kwargs) -> str:
             return "Please, /end the previous dialog to start a new one."
     phrase = dialog_managers[lang].start()
     user = databases[lang].add_phrase(user, phrase)
-    return phrase
+    return phrase.text
 
 commands = {
     '/start': show_help,
@@ -91,6 +91,7 @@ def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List
             user = databases[lang].add_phrase(database.add_phrase(user, message))
             phrase = dialog_managers[lang].reply(user.dialog)
             database.add_phrase(databases[lang].add_phrase(user, phrase))
+            return phrase.text
     else:
         return commands[command[0]](user_id=user_id, name=name, lang=lang)
 
