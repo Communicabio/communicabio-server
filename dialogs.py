@@ -12,6 +12,6 @@ class Manager:
     def start(self) -> Phrase:
         return Phrase(text=random.choice(self.dialogs))
 
-    def reply(self, history: List[Phrase] -> Phrase:
+    def reply(self, history: List[Phrase]) -> Phrase:
         # ...
         return history[-1]
