@@ -9,9 +9,9 @@ class Manager:
         with open(f"assets/dialog-{lang}.json") as file:
             self.dialogs = json.load(file)
 
-    def start() -> Phrase:
+    def start(self) -> Phrase:
         return Phrase(text=random.choice(self.dialogs))
 
-    def reply(history: List[Phrase], last: Phrase) -> Phrase:
+    def reply(self, history: List[Phrase], last: Phrase) -> Phrase:
         # ...
         return last;
