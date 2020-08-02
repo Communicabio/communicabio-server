@@ -34,4 +34,4 @@ curl -X POST \
 
 ## Github Actions
 
-See https://github.com/GoogleCloudPlatform/github-actions/tree/master/example-workflows/cloud-run .
+See https://github.com/GoogleCloudPlatform/github-actions/tree/master/example-workflows/cloud-run 
