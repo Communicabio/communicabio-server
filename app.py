@@ -81,7 +81,7 @@ commands = {
 def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List[str]]:
     command = parse_command(message)
     if len(command) == 0:
-        user = databases[lang].fetch_user(user_id)
+        user = databases[lang].fetch_user(user_id, name)
         if user.state == 0:
             if lang == 'ru':
                 return "Чтобы начать новый диалог используй /new"
