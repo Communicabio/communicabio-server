@@ -61,14 +61,14 @@ def end_dialog(user_id: int, name: str, lang: str, **kwargs) -> List[str]:
 
 def new_dialog(user_id: int, name: str, lang: str, **kwargs) -> str:
     """Starts new dialog if the previous is finished"""
-    user = database.fetch_user(user_id, name)
+    user = databases[lang].fetch_user(user_id, name)
     if user.state != 0:
         if lang == 'ru':
             return "Пожалуйста, закончите предыдущий диалог (/end), чтобы начать новый."
         else:
             return "Please, /end the previous dialog to start a new one."
-    phrase = dialog_manager.start()
-    user = database.add_phrase(user, phrase)
+    phrase = dialog_managers[lang].start()
+    user = databases[lang].add_phrase(user, phrase)
     return phrase
 
 commands = {
