@@ -5,6 +5,8 @@ import argparse
 import logging
 import db
 import dialogs
+import os
+import requests
 
 app = FastAPI()
 
@@ -12,32 +14,46 @@ parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('tg_token', help='Telegram Bot Token')
 parser.add_argument('mongo_url', help='Auth URL to MongoDB')
 parser.add_argument('lang', help='Language code', default='en')
-args = parser.parse_args()
 
-TOKEN = args.tg_token
-database = db.MongoDB(args.mongo_url, args.lang)
-dialog_manager = dialogs.Manager(args.lang)
+LANGUAGES = {'en'} #, 'ru'}
 
-def send_text(chat_id: int, text: str):
-    pass
+args = {
+    'mongo_url': os.getenv('MONGO_URL'),
+}
+
+token2lang = dict()
+lang2token = dict()
+
+for lang in LANGUAGES:
+    token = os.getenv(f'{lang.upper()}_TELEGRAM_TOKEN')
+    args[f'{lang}_telegram_token'] = token
+    token2lang[token] = lang
+    lang2token[lang] = token
+
+databases = {lang: db.MongoDB(args['mongo_url'], lang) for lang in LANGUAGES}
+dialog_managers = {lang: dialogs.Manager(lang) for lang in LANGUAGES}
+
+def send_text(chat_id: int, text: str, lang: str):
+    requests.post(f'https://api.telegram.org/bot{lang2token[lang]}/sendMessage',
+                    json={'chat_id': chat_id, 'text': text}).raise_for_status()
 
 def parse_command(text: str) -> List[str]:
     if text[0] != '/':
         return []
     return list(text.split())
 
-def show_help(**kwargs):
-    if args.lang == 'ru':
+def show_help(lang: str, **kwargs):
+    if lang == 'ru':
         return "*полезное сообщение, объясняющее все о боте*"
     else:
         return "*helpful message explaining everything about the bot*"
 
-def end_dialog(user_id: int, name: str, **kwargs) -> List[str]:
+def end_dialog(user_id: int, name: str, lang: str, **kwargs) -> List[str]:
     """Ends dialog. Shows feedback."""
     user = database.fetch_user(user_id, name)
     user, dialog = database.finish_dialog(user)
     messages = []
-    if args.lang == 'ru':
+    if lang == 'ru':
         text = f'Поздравляю - вы завершили диалог!\n'
                f'Баллы за вежливость {dialog.politeness} (от 0 до 1).\n'
                f'Баллы за позитивность {dialog.positivity} (от 0 до 1)'
@@ -49,11 +65,11 @@ def end_dialog(user_id: int, name: str, **kwargs) -> List[str]:
         messages.append(text)
     return messages
 
-def new_dialog(user_id: int, name: str, **kwargs) -> str:
+def new_dialog(user_id: int, name: str, lang: str, **kwargs) -> str:
     """Starts new dialog if the previous is finished"""
     user = database.fetch_user(user_id, name)
     if user.state != 0:
-        if args.lang == 'ru':
+        if lang == 'ru':
             return "Пожалуйста, закончите предыдущий диалог (/end), чтобы начать новый."
         else:
             return "Please, /end the previous dialog to start a new one."
@@ -68,32 +84,43 @@ commands = {
     '/new': new_dialog,
 }
 
-def process(user_id: int, message: str, name: str) -> Union[str, List[str]]:
+def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List[str]]:
     command = parse_command(message)
     if len(command) == 0:
-        user = database.fetch_user(user_id)
+        user = databases[lang].fetch_user(user_id)
         if user.state == 0:
-            if args.lang == 'ru':
+            if lang == 'ru':
                 return "Чтобы начать новый диалог используй /new"
             else:
                 return "To start new dialog use /new"
         else:
-            user database.add_phrase(database.add_phrase(user, message))
-            phrase = dialog_manager.continue(user.dialog)
-            database.add_phrase(database.add_phrase(user, phrase))
+            user = databases[lang].add_phrase(database.add_phrase(user, message))
+            phrase = dialog_managers[lang].continue(user.dialog)
+            database.add_phrase(databases[lang].add_phrase(user, phrase))
     else:
-        return commands[command[0]](user_id, name)
+        return commands[command[0]](user_id=user_id, name=name, lang=lang)
 
 @app.get("/tg/{token}")
 def receive_update(token: str, update: Dict[Any] = Body(..., embed=True)):
-    if not hmac.compare_digest(TOKEN, token):
+    lang = None
+    for TOKEN in token2lang:
+        if hmac.compare_digest(TOKEN, token):
+            lang = token2lang[TOKEN]
+            break
+    if lang is None:
         raise HTTPException(status_code=403, detail="Invalid token")
     if 'message' not in update:
         return {'error': 'Message is missing in the update'}
     chat_id = update['message']['chat']
     if 'text' not in update:
         return {'error': 'Text is missing in the message'}
-    text = process(user_id, update['message']['text'])
+
+    if len(update['message']['from'].get('username', '')) > 0:
+        name = update['message']['from']['username']
+    else:
+        name = update['message']['from']['first_name'] + ' ' + update['message']['from'].get('last_name')
+
+    text = process(user_id, update['message']['text'], name)
     if isinstance(text, str):
         send_text(user_id, text)
     else:
