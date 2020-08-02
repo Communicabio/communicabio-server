@@ -94,7 +94,7 @@ def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List
     else:
         return commands[command[0]](user_id=user_id, name=name, lang=lang)
 
-@app.get("/tg/{token}")
+@app.post("/tg/{token}")
 def receive_update(token: str, update: Dict[Any, Any] = Body(..., embed=True)):
     lang = None
     for TOKEN in token2lang:
