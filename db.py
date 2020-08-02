@@ -34,10 +34,10 @@ class MongoDB:
             cnt = 0
             total = 0
             for phrase in user.dialog:
-                if getattr(attr, phrase) is None:
+                if getattr(phrase, attr) is None:
                     continue
                 cnt += 1
-                total += getattr(attr, phrase)
+                total += getattr(phrase, attr)
             if cnt != 0:
                 setattr(dialog, attr, total / cnt)
         self.dialogs.insert_one(dialog.dict());
