@@ -21,7 +21,8 @@ class MongoDB:
         return User(**result)
 
     def add_phrase(self, user: User, phrase: Phrase) -> User:
-        self.users.update_one({'_id': user._id}, {'$push': {'dialog': phrase.dict()}})
+        self.users.update_one({'_id': user._id}, {'$push': {'dialog': phrase.dict()},
+                                                  '$set': {'state': 1}})
         user.dialog.append(phrase)
         return user
 
