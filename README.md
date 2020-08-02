@@ -1,23 +1,23 @@
 # communicabio-server
 
+The API server which process all inbound requests to Communicabio. It also runs other services if necessary.
+
 ## Usage
 
 ```shell
-./main.py \
-    --telegram-token TELEGRAM_TOKEN \
-    --vk-secret VK_SECRET \
-    --port 8080 \
-    --metric-api BERT_API \
-    --dialog-api DIALOG_API \
-    --mongodb MONGO_URL
+uvicorn app:app \
+    --telegram-token $TELEGRAM_TOKEN \
+    --port $PORT \
+    --mongodb $MONGO_URL
+    --metric-api $BERT_URL \
+    --dialog-api $DIALOG_URL \
 ```
-
 
 ## Deployment to GCP
 
 ```shell
-PROJECT_ID=stunning-hull-187717
-IMAGE=communicabio_server
+PROJECT_ID=communicabio
+IMAGE=api-server
 
 gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE
 ```
@@ -25,8 +25,9 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/$IMAGE
 ## Setting up webhooks...
 
 ```shell
+TOKEN=...
 curl -X POST \
      --header "Content-Type: application/json" \
-     -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0"}' \
-     'https://api.telegram.org/bot1079728001:AAElKzs3sokX7puQBnerJRbGyJ0acjETXL0/setWebhook'
+     -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/$TOKEN"}' \
+     'https://api.telegram.org/bot$TOKEN/setWebhook'
 ```

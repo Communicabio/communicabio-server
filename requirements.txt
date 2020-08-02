@@ -1,8 +1,4 @@
-aiohttp
-aiohttp_cors
-tornado
-motor
-nltk
-pymorphy2
-aiogram
+uvicorn
+fastapi
+pymongo
 dnspython
