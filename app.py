@@ -1,7 +1,6 @@
 from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, HTTPException, Body
 import hmac
-import argparse
 import logging
 import db
 import dialogs
@@ -9,11 +8,6 @@ import os
 import requests
 
 app = FastAPI()
-
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('tg_token', help='Telegram Bot Token')
-parser.add_argument('mongo_url', help='Auth URL to MongoDB')
-parser.add_argument('lang', help='Language code', default='en')
 
 LANGUAGES = {'en'} #, 'ru'}
 
