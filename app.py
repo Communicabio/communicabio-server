@@ -78,19 +78,23 @@ commands = {
     '/new': new_dialog,
 }
 
+def process_message(message: str) -> Phrase:
+    return Phrase(text=message)
+
 def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List[str]]:
     command = parse_command(message)
     if len(command) == 0:
         user = databases[lang].fetch_user(user_id, name)
+        message = process_message(message)
         if user.state == 0:
             if lang == 'ru':
                 return "Чтобы начать новый диалог используй /new"
             else:
                 return "To start new dialog use /new"
         else:
-            user = databases[lang].add_phrase(database.add_phrase(user, message))
             phrase = dialog_managers[lang].reply(user.dialog)
-            database.add_phrase(databases[lang].add_phrase(user, phrase))
+            databases[lang].add_phrase(user, message)
+            databases[lang].add_phrase(user, phrase)
             return phrase.text
     else:
         return commands[command[0]](user_id=user_id, name=name, lang=lang)
