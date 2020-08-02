@@ -108,6 +108,7 @@ def receive_update(token: str, update: Dict[Any, Any] = Body(...)):
     logging.warning(update)
     chat_id = update['message']['chat']
     if 'text' not in update['message']:
+        logging.info('Text is missing in the message')
         return {'error': 'Text is missing in the message'}
 
     if len(update['message']['from'].get('username', '')) > 0:
