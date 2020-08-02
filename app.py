@@ -116,10 +116,10 @@ def receive_update(token: str, update: Dict[Any, Any] = Body(...)):
     else:
         name = update['message']['from']['first_name'] + ' ' + update['message']['from'].get('last_name')
 
-    text = process(user_id, update['message']['text'], name)
+    text = process(chat_id, update['message']['text'], name)
     if isinstance(text, str):
-        send_text(user_id, text)
+        send_text(chat_id, text)
     else:
         for message in text:
-            send_text(user_id, message)
+            send_text(chat_id, message)
     return {"ok": True}
