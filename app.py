@@ -48,8 +48,8 @@ def end_dialog(user_id: int, name: str, lang: str, **kwargs) -> List[str]:
     user, dialog = database.finish_dialog(user)
     messages = []
     if lang == 'ru':
-        text = f'Поздравляю - вы завершили диалог!\n'
-               f'Баллы за вежливость {dialog.politeness} (от 0 до 1).\n'
+        text = f'Поздравляю - вы завершили диалог!\n' \
+               f'Баллы за вежливость {dialog.politeness} (от 0 до 1).\n' \
                f'Баллы за позитивность {dialog.positivity} (от 0 до 1)'
         messages.append(text)
     else:
