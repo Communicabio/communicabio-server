@@ -6,6 +6,7 @@ import db
 import dialogs
 import os
 import requests
+from schemes import Phrase
 
 app = FastAPI()
 
