@@ -1,4 +1,3 @@
-
 # communicabio-server
 
 The API server which process all inbound requests to Communicabio. It also runs other services if necessary.
@@ -32,3 +31,7 @@ curl -X POST \
      -d '{"url": "https://communicabio-server-b7e3qu3u4a-uc.a.run.app/webhooks/telegram/$TOKEN"}' \
      'https://api.telegram.org/bot$TOKEN/setWebhook'
 ```
+
+## Github Actions
+
+See https://github.com/GoogleCloudPlatform/github-actions/tree/master/example-workflows/cloud-run
