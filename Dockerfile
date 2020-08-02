@@ -5,9 +5,6 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 
-CMD cd /app && uvicorn app:app \
-    --tg_token $TELEGRAM_TOKEN \
-    --port $PORT \
-    --mongodb $MONGO_URL
+CMD cd /app && uvicorn app:app
 #    --metric-api $BERT_URL \
 #    --dialog-api $DIALOG_URL \
