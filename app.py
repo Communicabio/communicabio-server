@@ -93,8 +93,9 @@ def process(user_id: int, message: str, name: str, lang: str) -> Union[str, List
             else:
                 return "To start new dialog use /new"
         else:
+
+            user = databases[lang].add_phrase(user, message)
             phrase = dialog_managers[lang].reply(user.dialog)
-            databases[lang].add_phrase(user, message)
             databases[lang].add_phrase(user, phrase)
             return phrase.text
     else:
