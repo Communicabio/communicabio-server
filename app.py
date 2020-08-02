@@ -44,8 +44,8 @@ def show_help(lang: str, **kwargs):
 
 def end_dialog(user_id: int, name: str, lang: str, **kwargs) -> List[str]:
     """Ends dialog. Shows feedback."""
-    user = database.fetch_user(user_id, name)
-    user, dialog = database.finish_dialog(user)
+    user = databases[lang].fetch_user(user_id, name)
+    user, dialog = databases[lang].finish_dialog(user)
     messages = []
     if lang == 'ru':
         text = f'Поздравляю - вы завершили диалог!\n' \
