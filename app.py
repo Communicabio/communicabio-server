@@ -26,7 +26,7 @@ for lang in LANGUAGES:
     lang2token[lang] = token
 
 databases = {lang: db.MongoDB(args['mongo_url'], lang) for lang in LANGUAGES}
-dialog_managers = {lang: dialogs.Manager(lang) for lang in LANGUAGES}
+dialog_managers = {lang: dialogs.Manager(args['mongo_url'], lang) for lang in LANGUAGES}
 
 def send_text(chat_id: int, text: str, lang: str):
     requests.post(f'https://api.telegram.org/bot{lang2token[lang]}/sendMessage',
