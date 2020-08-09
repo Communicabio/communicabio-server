@@ -54,8 +54,8 @@ def end_dialog(user_id: int, name: str, lang: str, **kwargs) -> List[str]:
                f'Баллы за позитивность {dialog.positivity} (от 0 до 1)'
         messages.append(text)
     else:
-        text = f"Congratulations! You've finished the dialog." \
-               f"Politeness score: {dialog.politeness} out of 1." \
+        text = f"Congratulations! You've finished the dialog.\n" \
+               f"Politeness score: {dialog.politeness} out of 1.\n" \
                f"Positivity score: {dialog.positivity} out of 1."
         messages.append(text)
     return messages
