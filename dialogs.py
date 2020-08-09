@@ -14,7 +14,9 @@ class Manager:
         self.lang = lang
         self.client = pymongo.MongoClient(mongo_url)
         self.db = self.client[f'communicabio-{lang}']
-        self.dialogs = self.db['dialogs-vectorized']
+        with open(f'assets/dialog-{lang}.json') as file:
+            self.dialogs = json.load(file)
+        #self.dialogs = self.db['dialogs-vectorized']
 
     def start(self) -> Phrase:
         return Phrase(text=random.choice(self.dialogs))
