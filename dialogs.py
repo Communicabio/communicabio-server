@@ -33,6 +33,7 @@ class Manager:
         with open(f'assets/dialog-{lang}.json') as file:
             self.dialogs = json.load(file)
         self.gpt2_headers = request_auth(self.gpt2links[lang])
+        logging.info(self.gpt2_headers)
         #self.dialogs = self.db['dialogs-vectorized']
 
     def start(self) -> Phrase:
