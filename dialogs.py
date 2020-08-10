@@ -24,7 +24,7 @@ def request_auth(url):
 
 class Manager:
     gpt2links = {
-        'en': 'https://en-gpt2-ervice-pcdqvqhk7q-uc.a.run.app'
+        'en': 'https://en-gpt2-service-pcdqvqhk7q-uc.a.run.app'
     }
     def __init__(self, mongo_url: str, lang: str):
         self.lang = lang
